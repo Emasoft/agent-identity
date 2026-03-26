@@ -1,0 +1,46 @@
+name: Plugin Validation
+
+on:
+  push:
+    branches: [main, master]
+    paths:
+      - '.claude-plugin/**'
+      - 'agents/**'
+      - 'commands/**'
+      - 'skills/**'
+      - 'hooks/**'
+      - 'scripts/**'
+  pull_request:
+    branches: [main, master]
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Validate plugin.json
+        run: |
+          PLUGIN_JSON=".claude-plugin/plugin.json"
+          if [ ! -f "$PLUGIN_JSON" ]; then
+            echo "FAIL: $PLUGIN_JSON not found"
+            exit 1
+          fi
+          jq empty "$PLUGIN_JSON" || { echo "FAIL: Invalid JSON"; exit 1; }
+          jq '{name, version}' "$PLUGIN_JSON"
+
+      - name: Validate skills
+        run: |
+          if [ -d skills ]; then
+            for d in skills/*/; do
+              [ -f "$d/SKILL.md" ] && echo "OK: $(basename $d)" || echo "WARN: $(basename $d) missing SKILL.md"
+            done
+          fi
+
+      - name: Check scripts executable
+        run: |
+          if [ -d scripts ]; then
+            for f in scripts/*.sh; do
+              [ -f "$f" ] && [ ! -x "$f" ] && echo "WARN: $f not executable"
+            done
+          fi
