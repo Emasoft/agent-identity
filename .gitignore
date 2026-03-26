@@ -13,3 +13,40 @@ Thumbs.db
 *.pem
 *.key
 tokens/
+
+# Environment
+.env
+.env.*
+!.env.example
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+
+# Node
+node_modules/
+
+# Build artifacts
+dist/
+build/
+*.egg-info/
+
+# Linter/type checker caches
+.mypy_cache/
+.ruff_cache/
+.eslintcache
+
+# Claude Code
+.claude/
+
+# LLM Externalizer
+llm_externalizer_output/
+
+# TLDR
+.tldr/

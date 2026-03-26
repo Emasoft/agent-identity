@@ -207,10 +207,11 @@ _resolve_agent_dir() {
     return 0
 }
 
-# Exported variables (set by load_config)
+# Exported variables (set by load_config, used by sourcing scripts)
 AMP_DIR="${AMP_DIR:-}"
 AMP_KEYS_DIR=""
 AMP_AGENT_NAME=""
+# shellcheck disable=SC2034
 AMP_ADDRESS=""
 AMP_FINGERPRINT=""
 AMP_CONFIG=""
@@ -246,6 +247,7 @@ load_config() {
     fi
 
     AMP_AGENT_NAME=$(jq -r '.agent.name // .name // .agent_name // empty' "$AMP_CONFIG" 2>/dev/null)
+    # shellcheck disable=SC2034
     AMP_ADDRESS=$(jq -r '.agent.address // .address // .amp_address // empty' "$AMP_CONFIG" 2>/dev/null)
     AMP_FINGERPRINT=$(jq -r '.agent.fingerprint // .fingerprint // empty' "$AMP_CONFIG" 2>/dev/null)
 

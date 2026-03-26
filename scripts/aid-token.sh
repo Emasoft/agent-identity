@@ -22,6 +22,7 @@ set -e
 
 # Source AID helper for identity, keys, and signing
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# shellcheck source=aid-helper.sh
 source "${SCRIPT_DIR}/aid-helper.sh"
 
 # =============================================================================
@@ -32,6 +33,7 @@ AUTH_URL=""
 SCOPE=""
 OUTPUT_FORMAT="text"
 NO_CACHE=false
+# shellcheck disable=SC2034 # QUIET used by aid-helper.sh
 QUIET=false
 
 show_help() {
@@ -135,7 +137,8 @@ cache_key_for_auth() {
 }
 
 check_cache() {
-    local cache_file="${AID_CACHE_DIR}/$(cache_key_for_auth).json"
+    local cache_file
+    cache_file="${AID_CACHE_DIR}/$(cache_key_for_auth).json"
 
     if [ ! -f "$cache_file" ]; then
         return 1
@@ -167,12 +170,15 @@ check_cache() {
 
 save_cache() {
     local response="$1"
-    local cache_file="${AID_CACHE_DIR}/$(cache_key_for_auth).json"
+    local cache_file
+    cache_file="${AID_CACHE_DIR}/$(cache_key_for_auth).json"
 
     local expires_in
     expires_in=$(echo "$response" | jq -r '.expires_in // 3600')
+    local now_ts
+    now_ts=$(date +%s)
     local expires_at
-    expires_at=$(( $(date +%s) + expires_in ))
+    expires_at=$(( now_ts + expires_in ))
 
     echo "$response" | jq --arg ea "$expires_at" '. + {expires_at: ($ea | tonumber), auth_server: "'"$AUTH_URL"'"}' \
         > "$cache_file"

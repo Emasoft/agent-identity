@@ -15,6 +15,7 @@ set -e
 
 # Source AID helper for identity
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# shellcheck source=aid-helper.sh
 source "${SCRIPT_DIR}/aid-helper.sh"
 
 FORMAT="text"

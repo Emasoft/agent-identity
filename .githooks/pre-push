@@ -1,0 +1,31 @@
+#!/bin/bash
+# Pre-push hook: validate plugin structure before pushing
+set -e
+
+echo "=== Pre-push: Plugin validation ==="
+
+# Check plugin.json exists and is valid JSON
+if [ ! -f ".claude-plugin/plugin.json" ]; then
+  echo "ERROR: .claude-plugin/plugin.json not found"
+  exit 1
+fi
+
+if ! jq empty .claude-plugin/plugin.json 2>/dev/null; then
+  echo "ERROR: .claude-plugin/plugin.json is not valid JSON"
+  exit 1
+fi
+
+# Check SKILL.md exists
+if [ ! -f "skills/agent-identity/SKILL.md" ]; then
+  echo "ERROR: skills/agent-identity/SKILL.md not found"
+  exit 1
+fi
+
+# Check SKILL.md size (must be under 5000 chars)
+SKILL_SIZE=$(wc -c < "skills/agent-identity/SKILL.md")
+if [ "$SKILL_SIZE" -gt 5000 ]; then
+  echo "ERROR: SKILL.md is ${SKILL_SIZE} chars (max 5000)"
+  exit 1
+fi
+
+echo "=== Pre-push checks passed ==="
